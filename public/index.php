@@ -5,42 +5,25 @@ const IMAGE_PATH = '/images/';
 
 include '../vendor/autoload.php';
 
-use App\Renderer\HtmlRenderer;
 use App\Controller\ImageController;
 use App\Service\ImageService;
 use App\Validator\ImageParamValidator;
 use Intervention\Image\ImageManager;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 $request = Laminas\Diactoros\ServerRequestFactory::fromGlobals(
     $_SERVER, $_GET, $_POST, $_COOKIE, $_FILES
 );
 
 $router = new League\Route\Router;
+$controller = new ImageController(
+    new ImageService(
+        new ImageManager(['driver' => 'imagick'])
+    ),
+    new ImageParamValidator()
+);
 
-$router->map('GET', '/{fileName}', function (ServerRequestInterface $request, $args): ResponseInterface {
-        $controller = new ImageController(
-            new ImageService(
-                new ImageManager(['driver' => 'imagick'])
-            ),
-            new HtmlRenderer(TEMPLATE_PATH),
-            new ImageParamValidator()
-        );
-        return $controller->getImageAction($request, $args);
-});
-
-$router->map('GET', '/{fileName}/{width}/{height}', function (ServerRequestInterface $request, $args): ResponseInterface {
-    $controller = new ImageController(
-        new ImageService(
-            new ImageManager(['driver' => 'imagick'])
-        ),
-        new HtmlRenderer(TEMPLATE_PATH),
-        new ImageParamValidator()
-    );
-    return $controller->resizeImageAction($request, $args);
-});
-
+$router->map('GET', '/{fileName}/crop/{width}/{height}', $controller->cropImageAction(...));
+$router->map('GET', '/{fileName}/resize/{width}/{height}', $controller->resizeImageAction(...));
 $response = $router->dispatch($request);
 
 // send the response to the browser

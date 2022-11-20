@@ -41,4 +41,16 @@ class ImageService
 
         return $resizedImage;
     }
+
+    /**
+     * @throws ImageNotFoundException
+     */
+    public function cropImage(string $fileName, int $width, int $height): Image
+    {
+        $image = $this->getImage($fileName);
+        $resizedImage = $image->crop($width, $height);
+        $resizedImage->save();
+
+        return $resizedImage;
+    }
 }

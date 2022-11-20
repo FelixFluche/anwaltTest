@@ -9,6 +9,8 @@ use Intervention\Image\Image as InterventionImage;
 class Image
 {
     public const PATH = 'images/';
+    public const RESIZED = '_resized';
+    public const CROPPED = '_cropped';
 
     public function __construct(
         private InterventionImage $image,
@@ -25,7 +27,15 @@ class Image
     public function resize(int $width, int $height): self
     {
         $this->image = $this->image->resize($width, $height);
-        $this->name = $this->image->filename . $width . 'x' . $height;
+        $this->name = $this->image->filename . $width . 'x' . $height . self::RESIZED;
+
+        return $this;
+    }
+
+    public function crop(int $width, int $height): self
+    {
+        $this->image = $this->image->crop($width, $height);
+        $this->name = $this->image->filename . $width . 'x' . $height . self::CROPPED;
 
         return $this;
     }

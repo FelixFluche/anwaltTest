@@ -16,29 +16,25 @@ class ImageController
 {
     public function __construct(
         private ImageService $imageService,
-        private HtmlRenderer $htmlRenderer,
         private ImageParamValidator $paramValidator
     ) { }
 
-    public function getImageAction(ServerRequestInterface $request, array $args): ResponseInterface
+    public function cropImageAction(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        try {
-            $image = $this->imageService->getImage($args['fileName']);
-        } catch (ImageNotFoundException $exception) {
-            return $this->buildErrorResponse($exception->getMessage());
-        } catch (\Exception $exception) {
-            return $this->buildErrorResponse('Something went wrong. Please try again');
+        $result = $this->paramValidator->validate($args);
+
+        if ($result->hasErrors()) {
+            return new Response();
         }
 
-        $html = $this->htmlRenderer->render(
-            'index.html',
-            [
-                'image' =>  IMAGE_PATH . $image->getFullName()
-            ]
-        );
+        try {
+            $image = $this->imageService->cropImage($args['fileName'], (int)$args['width'], (int)$args['height']);
+        } catch (ImageNotFoundException) {
+            return new Response();
+        }
 
-        return new Response\HtmlResponse(
-            $html
+        return new Response\RedirectResponse(
+            sprintf('http://localhost:8080/images/%s', $image->getFullName())
         );
     }
 
@@ -47,33 +43,17 @@ class ImageController
         $result = $this->paramValidator->validate($args);
 
         if ($result->hasErrors()) {
-            return $this->buildErrorResponse(implode(',', $result->getErrors()));
+            return new Response();
         }
 
         try {
             $image = $this->imageService->resizeImage($args['fileName'], (int)$args['width'], (int)$args['height']);
-        } catch (ImageNotFoundException $exception) {
-            return $this->buildErrorResponse($exception->getMessage());
-        } catch (\Exception $exception) {
-            return $this->buildErrorResponse('Something went wrong. Please try again');
+        } catch (ImageNotFoundException) {
+            return new Response();
         }
 
         return new Response\RedirectResponse(
-            sprintf('/%s', $image->getFullName())
-        );
-    }
-
-    private function buildErrorResponse(string $message): ResponseInterface
-    {
-        $html = $this->htmlRenderer->render(
-            'error.html',
-            [
-                'error' => $message
-            ]
-        );
-
-        return new Response\HtmlResponse(
-            $html
+            sprintf('http://localhost:8080/images/%s', $image->getFullName())
         );
     }
 }
