@@ -8,7 +8,7 @@ docker-compose up or docker-compose up -d to start docker as demon
 ```
 ## Dependecies
 
-[Comnposer](https://getcomposer.org/)
+[Composer](https://getcomposer.org/)
 
 [thephpleague router 5.x](https://route.thephpleague.com/5.x/)
 
