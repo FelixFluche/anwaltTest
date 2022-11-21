@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 error_reporting(0);
-const TEMPLATE_PATH = '/var/www/html/src/templates/';
-const IMAGE_PATH = '/images/';
 
 include '../vendor/autoload.php';
 

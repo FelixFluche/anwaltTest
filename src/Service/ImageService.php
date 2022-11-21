@@ -35,7 +35,11 @@ class ImageService
      */
     public function resizeImage(string $fileName, int $width, int $height): Image
     {
-        $image = $this->getImage($fileName);
+        try {
+            return $this->getImage($this->buildFileName($fileName, Image::RESIZED, $width, $height));
+        } catch (ImageNotFoundException) {
+            $image = $this->getImage($fileName);
+        }
         $resizedImage = $image->resize($width, $height);
         $resizedImage->save();
 
@@ -47,10 +51,22 @@ class ImageService
      */
     public function cropImage(string $fileName, int $width, int $height): Image
     {
-        $image = $this->getImage($fileName);
+        try {
+            return $this->getImage($this->buildFileName($fileName, Image::CROPPED, $width, $height));
+        } catch (ImageNotFoundException) {
+            $image = $this->getImage($fileName);
+        }
         $resizedImage = $image->crop($width, $height);
         $resizedImage->save();
 
         return $resizedImage;
+    }
+
+    private function buildFileName(string $fileName, string $type, int $width, int $height): string
+    {
+        $fileNameParts = explode('.', $fileName);
+        $suffix = '.' . end($fileNameParts);
+
+        return $fileNameParts[0] . $width  . 'x' . $height . $type . $suffix;
     }
 }

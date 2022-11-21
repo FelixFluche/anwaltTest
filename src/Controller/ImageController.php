@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Exception\ImageNotFoundException;
-use App\Renderer\HtmlRenderer;
 use App\Service\ImageService;
 use App\Validator\ImageParamValidator;
 use Laminas\Diactoros\Response;
