@@ -18,4 +18,4 @@ docker-compose up or docker-compose up -d to start docker as demon
 
 If you use docker dependencies will be installed automatically
 
-Know you can reach the website via http://localhost:8080/index.html
+Now you can reach the website via http://localhost:8080/index.html
